@@ -175,7 +175,8 @@ body[data-mode=room] #plaque{bottom:24px}
  #colors{right:12px}#colors span{display:none}
  #loupe{display:none}
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#intro .card>*{opacity:1;transform:none}}
+@media (max-height:760px){#plaque h1{font-size:38px}#plaque .line{display:none}#intro h1{font-size:clamp(44px,8vh,80px);margin:12px 0 14px}#intro blockquote{margin-top:16px}#intro .go{margin-top:22px}}
 </style>
 </head>
 <body>
@@ -298,7 +299,7 @@ function fitBox(){
  if(mode==='room')return roomBox();
  var r=w.w/w.h;
  if(mob){var bw=Math.min(vw*.92,vh*.46*r);return{w:bw,h:bw/r,topPx:vh*.38}}
- var zTop=78,zBot=vh-(vh<760?250:300),bw2=Math.min(vw*.8,(zBot-zTop)*r);
+ var zTop=78,zBot=vh-(vh<760?280:300),bw2=Math.min(vw*.8,(zBot-zTop)*r);
  return{w:bw2,h:bw2/r,topPx:(zTop+zBot)/2};
 }
 var RS=1;

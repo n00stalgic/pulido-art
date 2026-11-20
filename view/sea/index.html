@@ -118,6 +118,31 @@ a{color:inherit}
 #contact .foot .mk{display:flex;align-items:center;gap:10px}
 #contact .foot img{width:18px;height:18px}
 
+/* inquiry form */
+#inq{position:fixed;inset:0;z-index:60;display:flex;justify-content:flex-end;pointer-events:none}
+#inq .scrim{position:absolute;inset:0;background:rgba(20,18,16,.38);opacity:0;transition:opacity .45s}
+#inq.on{pointer-events:auto}#inq.on .scrim{opacity:1}
+#inq .panel{position:relative;width:min(480px,100vw);height:100%;background:var(--wall);overflow:auto;padding:34px 36px 40px;transform:translateX(100%);transition:transform .6s var(--ease);box-shadow:-30px 0 60px -30px rgba(0,0,0,.35)}
+#inq.on .panel{transform:none}
+#inq .ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px}
+#inq .ph img{width:34px;height:34px}
+#inq h3{font-family:var(--serif);font-weight:400;font-size:34px;line-height:1.1}
+#inq .sub{color:var(--mute);font-size:15px;line-height:1.55;margin:12px 0 30px}
+#inq .wk{display:flex;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-bottom:26px}
+#inq .wk img{width:84px;height:56px;object-fit:cover}
+#inq .wk .tt{font-family:var(--serif);font-style:italic;font-size:19px}
+#inq label{display:block;margin:18px 0 8px;color:var(--mute)}
+#inq input,#inq select,#inq textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:transparent;border:0;border-bottom:1px solid #bdb7ae;padding:8px 0;border-radius:0;outline:none;transition:border-color .3s}
+#inq input:focus,#inq select:focus,#inq textarea:focus{border-color:var(--ink)}
+#inq textarea{min-height:96px;resize:vertical}
+#inq .hp{position:absolute;left:-9999px}
+#inq .send{margin-top:30px;width:100%;background:var(--ink);color:#fff;border-radius:999px;padding:17px}
+#inq .send[disabled]{opacity:.5}
+#inq .fine{color:var(--mute);font-size:13px;line-height:1.5;margin-top:16px}
+#inq .done{display:none;padding-top:20px}
+#inq.sent form,#inq.sent .wk{display:none}#inq.sent .done{display:block}
+#inq .err{color:#b3261e;font-size:14px;margin-top:12px;display:none}
+
 /* detail overlay */
 #deep{position:fixed;inset:0;z-index:50;background:#0a0a0a;opacity:0;pointer-events:none;transition:opacity .45s;cursor:grab;touch-action:none;color:#fff}
 #deep.on{opacity:1;pointer-events:auto}
@@ -166,7 +191,7 @@ a{color:inherit}
 <div id="prog"></div>
 <header id="bar">
   <a class="name lbl" href="#hero" aria-label="Chas Pulido, back to top"><img class="heart" src="heart.webp" alt=""><b>Chas Pulido</b><span>&nbsp;/&nbsp; The Sea Paintings</span></a>
-  <a class="inq lbl" href="#" id="barInq">Inquire</a>
+  <button class="inq lbl" id="barInq">Inquire</button>
 </header>
 
 <section id="hero">
@@ -232,10 +257,36 @@ a{color:inherit}
   <div class="lbl" style="opacity:.6">Inquiries</div>
   <h2 style="margin-top:20px">Holds, pricing and studio visits</h2>
   <p>All nine works are available. They are offered here first, through <span id="untilTxt"></span>, before they are shown anywhere else.</p>
-  <a class="btn lbl" id="contactBtn" href="#">Email Bianca Nieves</a>
-  <div class="addr lbl">bianca@pulido.art</div>
+  <button class="btn lbl" id="contactBtn">Make an inquiry</button>
   <div class="foot lbl"><span class="mk"><img class="heart" src="heart.webp" alt="">&copy; Chas Pulido</span><span>Pulido Art &middot; San Francisco</span></div>
 </section>
+
+<div id="inq" aria-hidden="true" role="dialog" aria-labelledby="inqT">
+  <div class="scrim" id="inqScrim"></div>
+  <div class="panel">
+    <div class="ph"><img class="heart" src="heart.webp" alt="Pulido Art"><button class="lbl" id="inqX">Close</button></div>
+    <h3 id="inqT">Inquire</h3>
+    <p class="sub">The studio will reply within one business day with availability, pricing details and next steps.</p>
+    <div class="wk" id="inqWork"></div>
+    <form id="inqForm" novalidate>
+      <label class="lbl" for="fInt">Regarding</label>
+      <select id="fInt" name="interest"></select>
+      <label class="lbl" for="fName">Name</label>
+      <input id="fName" name="name" autocomplete="name" required>
+      <label class="lbl" for="fEmail">Email</label>
+      <input id="fEmail" name="email" type="email" autocomplete="email" required>
+      <label class="lbl" for="fOrg">Gallery or organization</label>
+      <input id="fOrg" name="org" autocomplete="organization">
+      <label class="lbl" for="fMsg">Message</label>
+      <textarea id="fMsg" name="message" placeholder="Holds, shipping, a studio visit, anything you would like to know."></textarea>
+      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="send lbl" id="fSend" type="submit">Send inquiry</button>
+      <div class="err" id="fErr"></div>
+      <p class="fine">Your details go only to the Pulido Art studio.</p>
+    </form>
+    <div class="done"><h3>Thank you.</h3><p class="sub" id="doneTxt">Your inquiry is with the studio. We will be in touch within one business day.</p></div>
+  </div>
+</div>
 
 <div id="deep" aria-hidden="true">
   <img id="deepImg" alt="">
@@ -260,7 +311,7 @@ a{color:inherit}
 (function(){
 var IMG='https://pulido.art/img/';
 var HOOK='https://hyakutake.app.n8n.cloud/webhook/pulido-view-event';
-var CONTACT='bianca@pulido.art';
+var INQ='https://hyakutake.app.n8n.cloud/webhook/pulido-inquiry';
 var UNTIL='January 15, 2027';
 var W=[
  {id:'2026-30',t:'Crashing Coasts',y:2026,w:96,h:48,p:35000,line:'White breaks across a warm ground like surf hitting rock, thrown in long arcs over a tangle of dark blue.'},
@@ -281,8 +332,6 @@ var SID=(function(){try{var s=sessionStorage.getItem('pv_sid');if(!s){s=Math.ran
 function cm(i){return(i*2.54).toFixed(1)}
 function ftin(i){var f=Math.floor(i/12),r=i%12;return f+'′'+(r?' '+r+'″':'')}
 function money(n){return'$'+n.toLocaleString('en-US')}
-function mailto(w){var sub=w?'The Sea Paintings: '+w.t:'The Sea Paintings',b=w?'Hi Bianca,\n\nI would like to know more about '+w.t+' ('+w.y+', '+w.h+' x '+w.w+' in.).\n\n':'Hi Bianca,\n\n';
- return'mailto:'+CONTACT+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(b)}
 
 /* tracking */
 var queue=[],flushT=null;
@@ -299,9 +348,7 @@ track('open',null,null,FOR||null);
 $('heroBg').style.backgroundImage='url('+IMG+'2026-30-1600.webp)';
 $('forLine').textContent=FOR?'Private viewing for '+FOR+' · through '+UNTIL:'Private viewing · through '+UNTIL;
 $('untilTxt').textContent=UNTIL;
-$('contactBtn').href=mailto(null);$('barInq').href=mailto(null);
-$('contactBtn').addEventListener('click',function(){track('inquire',null,null,'contact');flush()});
-$('barInq').addEventListener('click',function(){track('inquire',null,null,'bar');flush()});
+$('contactBtn').onclick=function(){openInq(null,'contact')};$('barInq').onclick=function(){openInq(null,'bar')};
 function barTone(){var hb=$('hero').getBoundingClientRect().bottom,ct=$('contact').getBoundingClientRect().top;$('bar').classList.toggle('light',hb<60&&ct>60)}addEventListener('scroll',barTone,{passive:true});barTone();
 
 /* works, all drawn at one shared scale */
@@ -314,12 +361,12 @@ W.forEach(function(w,i){
  '<div class="hang"><figure><img loading="lazy" decoding="async" src="'+IMG+w.id+'-1600.webp" srcset="'+IMG+w.id+'-1000.webp 1000w, '+IMG+w.id+'-1600.webp 1600w, '+IMG+w.id+'-2400.webp 2400w" sizes="80vw" alt="'+w.t+', '+w.y+', acrylic on canvas, '+w.h+' by '+w.w+' inches"><span class="hint lbl">View detail</span></figure></div>'+
  '<div class="cap"><div class="tomb"><div class="artist">Chas Pulido</div><div class="m">American, b. 1997</div><div class="title">'+w.t+', <span style="font-style:normal">'+w.y+'</span></div><div>Acrylic on canvas</div><div class="m">'+w.h+' &times; '+w.w+' in. ('+cm(w.h)+' &times; '+cm(w.w)+' cm)</div>'+
  '<div class="avail"><i></i>Available &middot; '+money(w.p)+'</div></div>'+
- '<div><p class="note">'+w.line+'</p><div class="acts lbl"><button data-a="deep">View detail</button><button data-a="room">See it in a room</button><a class="inq" data-a="inq" href="'+mailto(w)+'">Inquire</a></div></div></div>';
+ '<div><p class="note">'+w.line+'</p><div class="acts lbl"><button data-a="deep">View detail</button><button data-a="room">See it in a room</button><button class="inq" data-a="inq">Inquire</button></div></div></div>';
  box.appendChild(s);figs.push(s.querySelector('figure'));
  s.querySelector('figure').onclick=function(){openDeep(i)};
  s.querySelector('[data-a=deep]').onclick=function(){openDeep(i)};
  s.querySelector('[data-a=room]').onclick=function(){openRoom(i)};
- s.querySelector('[data-a=inq]').addEventListener('click',function(){track('inquire',w.id);flush()});
+ s.querySelector('[data-a=inq]').onclick=function(){openInq(i)};
 });
 function sizeWorks(){var k=shared();W.forEach(function(w,i){figs[i].style.width=(w.w*k)+'px';figs[i].style.height=(w.h*k)+'px'})}
 
@@ -404,9 +451,30 @@ function layoutRoom(){var w=W[rCur],vw=innerWidth,vh=innerHeight;
  var hd=$('hdim');hd.style.left=(left-36)+'px';hd.style.top=top+'px';hd.style.height=bh+'px';hd.querySelector('span').textContent=w.h+' in. · '+cm(w.h)+' cm'}
 $('roomX').onclick=closeRoom;
 
+/* inquiry */
+var inq=$('inq'),inqWork=null,sel=$('fInt');
+sel.innerHTML='<option value="The full series">The full series</option>'+W.map(function(w){return'<option value="'+w.id+'">'+w.t+', '+w.y+'</option>'}).join('')+'<option value="Studio visit">A studio visit</option>';
+if(FOR)$('fOrg').value=FOR;
+function paintWork(){var v=sel.value,w=byId(v);$('inqWork').innerHTML=w?'<img src="'+IMG+w.id+'-1000.webp" alt=""><div><div class="tt">'+w.t+', '+w.y+'</div><div class="lbl" style="color:var(--mute);margin-top:4px">'+w.h+' \u00d7 '+w.w+' in. \u00b7 Available</div></div>':'';$('inqWork').style.display=w?'flex':'none'}
+sel.onchange=paintWork;
+function openInq(i,src){inq.classList.remove('sent');sel.value=i==null?'The full series':W[i].id;paintWork();inq.classList.add('on');inq.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+ track('inquire',i==null?null:W[i].id,null,src||'work');setTimeout(function(){$('fName').focus()},450)}
+function closeInq(){if(!inq.classList.contains('on'))return;inq.classList.remove('on');inq.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+$('inqX').onclick=closeInq;$('inqScrim').onclick=closeInq;
+$('inqForm').addEventListener('submit',function(e){e.preventDefault();var err=$('fErr');err.style.display='none';
+ var n=$('fName').value.trim(),em=$('fEmail').value.trim();
+ if(!n||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){err.textContent='Please add your name and a valid email.';err.style.display='block';return}
+ var v=sel.value,w=byId(v),body=new URLSearchParams({room:'sea',g:G||'',sid:SID,name:n,email:em,org:$('fOrg').value.trim(),interest:w?w.t:v,work:w?w.id:'',message:$('fMsg').value,website:this.website.value});
+ if(!/pulido\.art$|localhost/.test(location.hostname)){err.textContent='This is a preview, so it cannot send. The form works on pulido.art.';err.style.display='block';return}
+ var btn=$('fSend');btn.disabled=true;btn.textContent='Sending';
+ fetch(INQ,{method:'POST',body:body}).then(function(r){if(!r.ok)throw 0;inq.classList.add('sent');track('inquire',w?w.id:null,null,'sent');flush()})
+ .catch(function(){err.textContent='That did not go through. Please try again in a moment.';err.style.display='block'})
+ .then(function(){btn.disabled=false;btn.textContent='Send inquiry'});
+});
+
 /* keys */
 addEventListener('keydown',function(e){
- if(e.key==='Escape'){closeDeep();closeRoom();return}
+ if(e.key==='Escape'){closeDeep();closeRoom();closeInq();return}
  if(deep.classList.contains('on')){if(e.key==='+'||e.key==='=')zoomAt(innerWidth/2,innerHeight/2,1.5,true);if(e.key==='-')zoomAt(innerWidth/2,innerHeight/2,1/1.5,true);return}
  if(room.classList.contains('on')){if(e.key==='ArrowRight')openRoom((rCur+1)%9);if(e.key==='ArrowLeft')openRoom((rCur+8)%9);return}
 });

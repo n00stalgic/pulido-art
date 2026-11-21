@@ -54,6 +54,7 @@ for r in cfg['rooms']:
                .replace('{{ESSAY}}', essay)
                .replace('{{HERO}}', r['hero'])
                .replace('{{COUNT_WORD}}', NUM[n])
+               .replace('{{WALL_WORD}}', NUM[len(r['walls'])])
                .replace('{{DATA}}', json.dumps(data, ensure_ascii=False).replace('</', '<\\/')))
     os.makedirs(os.path.join(OUT, r['slug']), exist_ok=True)
     open(os.path.join(OUT, r['slug'], 'index.html'), 'w').write(page)
